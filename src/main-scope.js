@@ -17,9 +17,9 @@ IDB.onupgradeneeded = function(e){
     if (!db.objectStoreNames.contains(current_readings)) { // if there's no "books" store
         
         /* === */
-        current_store = db.createObjectStore(current_readings, {
+        current_store = db.createObjectStore(current_readings/* , {
             keyPath: namespaces.primary_key_one
-        })
+        } */)
         // console.log(`${current_store}=?`, /* e.g. */current_store.keyPath);
         /* === */
 
@@ -34,9 +34,9 @@ IDB.onupgradeneeded = function(e){
             .transaction(current_readings, "readwrite")
             .objectStore(current_readings)
             .add({
-                [namespaces.primary_key_one] : "first_book",
+                /* [namespaces.primary_key_one] : "first_book", */
                 "Hello" : "Init"
-            })
+            }, "my_first_book")
         })
 }
 
@@ -51,7 +51,7 @@ IDB.onsuccess = function(e){
     */
     const transaction =  e.target.result.transaction([current_readings]);
     const objectStore = transaction.objectStore(current_readings);
-    const request = objectStore.get("first_book");
+    const request = objectStore.get("my_" + "first_book");
     request.addEventListener("success", (e)=>{
         const requested_data =  e.target.result;
         const current_objectStore =  e.target.source;
