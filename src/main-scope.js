@@ -45,24 +45,26 @@ IDB.onsuccess = function(e){
     // If the onupgradeneeded event exits successfully, the onsuccess handler of the open database request will then be triggered
     /** @tutorial{@link https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB#creating_or_updating_the_version_of_the_database} */
     console.log(`onsuccess: ${e.target.result}`, e.target.result)
-    
-    console.log(`e.target == this :=`, e.target == this);
-    console.log(`current_database_name := ${this.result.name}`) 
-
-    let request = e.target.result.transaction(current_readings/* , "readonly" *//* <= @DEFAULT */)
-    .objectStore(current_readings)
-    .get("")
+    /*
+        console.log(`e.target == this :=`, e.target == this);
+        console.log(`current_database_name := ${this.result.name}`) 
+    */
+    const transaction =  e.target.result.transaction([current_readings]);
+    const objectStore = transaction.objectStore(current_readings);
+    const request = objectStore.get("first_book");
     request.addEventListener("success", (e)=>{
+        const requested_data =  e.target.result;
         const current_objectStore =  e.target.source;
+        console.log("requested_data (/GET)=?", requested_data)
         console.log("request (success)=?", current_objectStore.keyPath)
-        console.log(`namespaces.primary_key_one === e.target.source.keyPath :=`, namespaces.primary_key_one === current_objectStore.keyPath);
+        /* console.log(`namespaces.primary_key_one === e.target.source.keyPath :=`, namespaces.primary_key_one === current_objectStore.keyPath); */
     })
     request.addEventListener("error", (e)=>{
         console.log("request (error)=?", e)
     })
 
 
-    
+
     // // === DEV_NOTE # OPEN CONSOLE ON USER-AGENT OF CHOICE OPEN INDEXEDDB UNCOMMENT CODE BLOCK BELOW WHIlST OBSERVING INSTANT CHANGES (MIGHT NEED TO REFRESH OBJECT STORE) ===
     /* e.target.result.transaction(current_readings, "readwrite")
     .objectStore(current_readings)
