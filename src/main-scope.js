@@ -1,33 +1,33 @@
-import V from "./virtual-versioning-map";
+/* import V from "./virtual-versioning-map"; */// DEV_NOTE # currently not required, so commented out
 
 const object_store_name = "object_store_name:anatomy";
 const keyPathNS = {
-    primary_key_one: 'PK1'
+    primary_key_one: "PK1"
 }
 
 /** @tutorial{@link https://github.com/hnasr/indexedDB/blob/master/index.html} */
-const IDB = indexedDB.open("db_name:academic-library", V.get("v100"));
+const IDB = indexedDB.open("db_name:academic-library", 1);
+
+let current_store = null;
+let db = null;
 
 // DEV_NOTE # runs only when version changes : suitable for initial data (state) mount
 IDB.onupgradeneeded = function(e){
-    
-    /* console.log(`onupgradeneeded: ${e.target.result}`, e.target.result) */// [PASSED]
 
-    let current_store = null;
-    let db = e.target.result;
+    db = e.target.result;
+    
     // DEV_NOTE # if there's no store by given name, then create one ...
     if (!db.objectStoreNames.contains(object_store_name)) {
         /* === */
         current_store = db.createObjectStore(object_store_name, {
-            autoIncrement: true
-            /* keyPath: keyPathNS.primary_key_one */
+            autoIncrement: true,
+            keyPath: keyPathNS.primary_key_one
         })
         // console.log(`${current_store}=?`, /* e.g. */current_store.keyPath);
-        /* === */
-
     }
 
     /** @tutorial{@link https://stackoverflow.com/questions/33709976/uncaught-invalidstateerror-failed-to-execute-transaction-on-idbdatabase-a} */
+    // DEV_NOTE # suitable for initial state configuration applied to targeted objectStore
     /* e.target === current_store */ current_store.transaction.addEventListener("complete",  function(e){
 
         /* console.log("this == e.target", this, e.target); */// PASSED
@@ -47,7 +47,7 @@ IDB.onupgradeneeded = function(e){
             // DEV_NOTE # add more values key-value pairs if needed as follows 
             "Your" : "Book"
 
-        }/* , 1 */)
+        }/* , 1 *//* this is what autoIncrement does for us internally */)
             transactionOne.onsuccess = function(e){
                 console.log("transactionOne.onsuccess")
             }
@@ -55,7 +55,7 @@ IDB.onupgradeneeded = function(e){
                 console.error("transactionOne.onerror")
             }
         objectStoreEntry.add({"Grey's" : "Anatomy"}
-        /* , 2 */)
+        /* , 2 *//* this is what autoIncrement does for us internally */)
     })
 }
 
